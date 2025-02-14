@@ -3,7 +3,7 @@
 ## Overview
 This project simulates a walking motion for a humanoid robot using 6 servo motors. The robot uses 2 servos for each leg (one for the knee and one for the ankle), and 2 additional servos for the waist to assist with balance and stability. The walking cycle alternates between the two legs, with one leg swinging forward while the other remains flat on the ground for support.
 
-## Algorithm Steps
+## Algorithm Steps.
 
 ### 1. **Initialization:**
 - Set all motors (hip, knee, and ankle) to the neutral position (e.g., 90°).
