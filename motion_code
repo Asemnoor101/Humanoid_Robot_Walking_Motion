@@ -1,0 +1,134 @@
+#include <Servo.h>
+
+// Define servo objects for each leg and waist
+Servo ankleMotorLeft, ankleMotorRight;  // Foot (ankle) motors for both legs
+Servo kneeMotorLeft, kneeMotorRight;    // Knee motors for both legs
+Servo waistMotorLeft, waistMotorRight;  // Waist motors for balance
+
+// Define the servo pin numbers
+int anklePinLeft = 9, anklePinRight = 10;
+int kneePinLeft = 6, kneePinRight = 5;
+int waistPinLeft = 7, waistPinRight = 8;
+
+// Initialization of servo angles (standing position)
+int ankleAngleLeft = 90, ankleAngleRight = 90;
+int kneeAngleLeft = 90, kneeAngleRight = 90;
+int waistAngle = 90;  // Neutral waist angle for balance
+
+void setup() {
+  // Attach the servos to their respective pins
+  ankleMotorLeft.attach(anklePinLeft);
+  ankleMotorRight.attach(anklePinRight);
+  
+  kneeMotorLeft.attach(kneePinLeft);
+  kneeMotorRight.attach(kneePinRight);
+  
+  waistMotorLeft.attach(waistPinLeft);
+  waistMotorRight.attach(waistPinRight);
+  
+  // Set the robot to an initial standing position
+  setStandingPosition();
+}
+
+void loop() {
+  // Walking cycle (alternating between the legs)
+  walkingCycle();
+  delay(100); // Delay between steps (adjust for walking speed)
+}
+
+void setStandingPosition() {
+  // Set all servos to the standing position (neutral 90 degrees)
+  ankleMotorLeft.write(ankleAngleLeft);
+  ankleMotorRight.write(ankleAngleRight);
+  
+  kneeMotorLeft.write(kneeAngleLeft);
+  kneeMotorRight.write(kneeAngleRight);
+  
+  waistMotorLeft.write(waistAngle);  // Set the left waist motor to neutral
+  waistMotorRight.write(waistAngle); // Set the right waist motor to neutral
+}
+
+void walkingCycle() {
+  // Left leg swinging and right leg supporting
+  shiftWeightToLeg(LEFT);
+  swingLeg(LEFT);
+  landFoot(LEFT);
+  shiftToNewLeg(RIGHT);  // Prepare the right leg for the next step
+  
+  // Right leg swinging and left leg supporting
+  shiftWeightToLeg(RIGHT);
+  swingLeg(RIGHT);
+  landFoot(RIGHT);
+  shiftToNewLeg(LEFT);  // Prepare the left leg for the next step
+}
+
+void shiftWeightToLeg(int leg) {
+  if (leg == LEFT) {
+    // Shift weight to the right leg and lift the left leg
+    kneeMotorLeft.write(45);  // Slight bend in knee
+    ankleMotorLeft.write(15); // Lift the foot
+    
+    kneeMotorRight.write(90); // Right knee stays in neutral
+    ankleMotorRight.write(90); // Right foot stays neutral
+
+    // Waist motors adjust to maintain balance
+    waistMotorLeft.write(80);
+    waistMotorRight.write(100);
+    
+  } else {
+    // Shift weight to the left leg and lift the right leg
+    kneeMotorRight.write(45);   // Slight bend in knee
+    ankleMotorRight.write(15);  // Lift the foot
+    
+    kneeMotorLeft.write(90);  // Left knee stays in neutral
+    ankleMotorLeft.write(90); // Left foot stays neutral
+
+    // Waist motors adjust to maintain balance
+    waistMotorLeft.write(100);
+    waistMotorRight.write(80);
+  }
+}
+
+void swingLeg(int leg) {
+  if (leg == LEFT) {
+    // Move the left leg forward
+    kneeMotorLeft.write(180); // Straighten knee for smooth swing
+    ankleMotorLeft.write(0);  // Adjust ankle position to clear the ground
+  } else {
+    // Move the right leg forward
+    kneeMotorRight.write(180); // Straighten knee for smooth swing
+    ankleMotorRight.write(0);  // Adjust ankle position to clear the ground
+  }
+}
+
+void landFoot(int leg) {
+  if (leg == LEFT) {
+    // Place the left foot on the ground
+    kneeMotorLeft.write(90);  // Stabilize knee
+    ankleMotorLeft.write(90); // Place foot flat on the ground
+    waistMotorLeft.write(90);
+    waistMotorRight.write(90); // Balance adjustment after landing
+  } else {
+    // Place the right foot on the ground
+    kneeMotorRight.write(90);  // Stabilize knee
+    ankleMotorRight.write(90); // Place foot flat on the ground
+    waistMotorLeft.write(90);
+    waistMotorRight.write(90); // Balance adjustment after landing
+  }
+}
+
+void shiftToNewLeg(int leg) {
+  if (leg == LEFT) {
+    // Move the left leg back to its starting position for the next step
+    kneeMotorLeft.write(90);
+    ankleMotorLeft.write(90);
+  } else {
+    // Move the right leg back to its starting position for the next step
+    kneeMotorRight.write(90);
+    ankleMotorRight.write(90);
+  }
+
+  // Waist motor adjustments for stability as the leg shifts
+  waistMotorLeft.write(90);
+  waistMotorRight.write(90);
+}
